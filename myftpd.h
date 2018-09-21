@@ -19,3 +19,5 @@
 
 
 int socket_bind_listen(int port);
+int accept_connection(int sockfd);
+void handle_ftp_requests(int newfd);

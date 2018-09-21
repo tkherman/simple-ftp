@@ -3,9 +3,12 @@
 
 CXX=		g++
 CXFLAGS=	-g -std=c++11
-TARGETS=	myftpd
+TARGETS=	myftpd myftp
 
 all: $(TARGETS)
 
 myftpd: myftpd.cpp myftpd.h
+	$(CXX) $(CXFLAGS) -o $@ $<
+
+myftp: myftp.cpp myftp.h
 	$(CXX) $(CXFLAGS) -o $@ $<

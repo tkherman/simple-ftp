@@ -44,6 +44,43 @@ int socket_bind_listen(int port) {
 
 }
 
+int accept_connection(int sockfd) {
+    int newfd;
+    struct sockaddr_storage their_addr;
+    socklen_t sin_size;
+
+    sin_size = sizeof(their_addr);
+    newfd = accept(sockfd, (struct sockaddr *)&their_addr, &sin_size);
+    if (newfd == -1) {
+        perror("ERROR in accepting");
+        return -1;
+    }
+    printf("Received connection\n");
+
+    return newfd;
+}
+
+void handle_ftp_requests(int fd) {
+    bool running = true;
+    char buf[BUFSIZ];
+    
+    while (running) {
+        memset(&buf, 0, BUFSIZ);
+        if ((recv(fd, buf, BUFSIZ-1, 0)) < 0) {
+            perror("ERROR in recving message");
+            return;
+        }
+
+        if (!strcmp(buf, "EXIT")) {
+            running = false;
+        } else {
+            printf("%s\n", buf);
+            fflush(stdout);
+        }
+    }
+    printf("\n");
+}
+
 int main(int argc, char** argv) {
     int port;
     int sockfd, newfd;
@@ -59,15 +96,14 @@ int main(int argc, char** argv) {
     if ((sockfd = socket_bind_listen(port)) < 0)
         exit(1);
 
-    std::cout << "server: Waiting for connection...\n";
     while (1) {
-        sin_size = sizeof(their_addr);
-        newfd = accept(sockfd, (struct sockaddr *)&their_addr, &sin_size);
-        if (newfd == -1) {
-            perror("ERROR in accepting");
+        printf("Waiting for connection...\n");
+        if ((newfd = accept_connection(sockfd)) < 0)
             continue;
-        }
-        std::cout << "server: Received connection\n";
+
+        handle_ftp_requests(newfd);
         close(newfd);
     }
+
+    close(sockfd);
 }
