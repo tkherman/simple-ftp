@@ -42,6 +42,42 @@ int socket_connect(char *host, int port) {
     return s;
 }
 
+Operation parse_input(std::vector<std::string>& arguments) {
+    std::string input;
+    std::cout << "> ";
+    getline(std::cin, input);
+
+    Operation op;
+    std::string token;
+    std::istringstream ss(input);
+
+    std::getline(ss, token, ' ');
+    if (!token.compare("DL"))
+        op = DL;
+    else if (!token.compare("UP"))
+        op = UP;
+    else if (!token.compare("RM"))
+        op = RM;
+    else if (!token.compare("LS"))
+        op = LS;
+    else if (!token.compare("MKDIR"))
+        op = MKDIR;
+    else if (!token.compare("RMDIR"))
+        op = RMDIR;
+    else if (!token.compare("CD"))
+        op = CD;
+    else if (!token.compare("EXIT"))
+        op = EXIT;
+    else
+        op = UNKNOWN;
+
+    while (std::getline(ss, token, ' ')) {
+        arguments.push_back(token);
+    }
+
+    return op;
+}
+
 
 int main(int argc, char* argv[])
 {
@@ -50,6 +86,8 @@ int main(int argc, char* argv[])
     char *host;
     char buf[BUFSIZ];
     bool running = true;
+    Operation op;
+    std::vector<std::string> command_arguments;
 
     if (argc != 3)
     {
@@ -63,31 +101,36 @@ int main(int argc, char* argv[])
         exit(1);
     }
 
-    
-    while(running)
-    {
-        memset(&buf, 0, BUFSIZ);
-        fputs("> ", stdout);
-        fgets(buf, BUFSIZ, stdin);
-        size_t len = strlen(buf);
-        if (buf[len-1] == '\n') {
-            buf[len-1] = '\0';
-        }
+    while (running) {
+        command_arguments = std::vector<std::string>();
+        op = parse_input(command_arguments);
 
-        if (!strcmp(buf, "EXIT")) {
-            if ((send(sockfd, buf, BUFSIZ, 0)) < 0) {
-                fprintf(stderr, "Failed to send message");
-                continue;
-            }
-            running = false;
-            printf("Closing connection");
-        } else {
-            if ((send(sockfd, buf, BUFSIZ, 0)) < 0) {
-                fprintf(stderr, "Failed to send message");
-                continue;
-            }
+        switch(op) {
+            case DL:
+                break;
+            case UP:
+                break;
+            case RM:
+                break;
+            case LS:
+                break;
+            case MKDIR:
+                break;
+            case RMDIR:
+                break;
+            case CD:
+                break;
+            case EXIT:
+                strcpy(buf, "EXIT");
+                if ((send(sockfd, buf, strlen(buf), 0)) < 0) {
+                    std::cerr << "Failed to send message" << std::endl;
+                    continue;
+                }
+                running = false;
+                std::cout << "Closing connection" << std::endl;
+                break;
         }
-    }
+    }    
 
     close(sockfd);
 }
