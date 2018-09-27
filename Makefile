@@ -7,10 +7,10 @@ TARGETS=	myftpd myftp
 
 all: $(TARGETS)
 
-myftpd: myftpd.o server_op.o
+myftpd: myftpd.o server_op.o network_utils.o
 	$(CXX) $(CXFLAGS) -o $@ $^
 
-myftp: myftp.o client_op.o
+myftp: myftp.o client_op.o network_utils.o
 	$(CXX) $(CXFLAGS) -o $@ $^
 
 myftpd.o: myftpd.cpp myftpd.h
@@ -23,6 +23,9 @@ myftp.o: myftp.cpp myftp.h
 	$(CXX) $(CXFLAGS) -o $@ -c $<
 
 client_op.o: client_op.cpp myftp.h
+	$(CXX) $(CXFLAGS) -o $@ -c $<
+
+network_utils.o: network_utils.cpp network_utils.h
 	$(CXX) $(CXFLAGS) -o $@ -c $<
 
 clean:

@@ -7,33 +7,24 @@
 
 #include "myftpd.h"
 
-void receive_upload_file(int sockfd, char* buf) {
-    std::cout << "handling recving file" << std::endl;
-    int n;
-    uint16_t filename_len;
+void receive_upload_file(int sockfd) {
+    std::cout << "Handling file upload from client" << std::endl;
     std::string filename;
-    //char buf[BUFSIZ];
     
-    // Receive filename length and filename
-    memset(&buf, 0, BUFSIZ);
-    if ((n = recv(sockfd, buf, BUFSIZ-1, 0)) < 0) {
-        perror("Failed to receive filename length");
+    // Get filename from client
+    if(recv_filename(sockfd, filename) < 0) {
+        std::cerr << "Server failed to get filename from client" << std::endl;
         return;
     }
-    std::cout << buf << std::endl;
-    memcpy((void*)&filename_len, (void*)buf, n);
-    filename_len = ntohs(filename_len);
 
-    memset(&buf, 0, BUFSIZ);
-    if ((recv(sockfd, buf, BUFSIZ-1, 0)) < 0) {
-        perror("Failed to receive filename");
-        return;
+    std::cout << "Client attempt to upload: " << filename << std::endl;
+
+    // Resend filename back to client to acknowledge client that server
+    // is ready
+    if (send_filename(sockfd, filename) < 0) {
+        std::cerr << "Failed to resend filename back to client" << std::endl;
     }
-    filename = std::string(buf);
-    
-    std::cout << "filename length: " << filename_len << std::endl;
-    std::cout << "filename       : " << buf << std::endl;
-    std::flush(std::cout);
+
 
     return;
 }

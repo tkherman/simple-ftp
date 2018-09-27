@@ -5,6 +5,8 @@
  * myftpd.h
  */
 
+#include "network_utils.h"
+
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -19,7 +21,7 @@
 #define BACKLOG 1
 
 /* server operations */
-void receive_upload_file(int sockfd, char* buf);
+void receive_upload_file(int sockfd);
 
 /* server set up */
 int socket_bind_listen(int port);

@@ -122,11 +122,8 @@ int main(int argc, char* argv[])
             case CD:
                 break;
             case EXIT:
-                strcpy(buf, "EXIT");
-                if ((send(sockfd, buf, strlen(buf), 0)) < 0) {
-                    std::cerr << "Failed to send message" << std::endl;
+                if (send_string(sockfd, std::string("EXIT")) != 0)
                     continue;
-                }
                 running = false;
                 std::cout << "Closing connection" << std::endl;
                 break;

@@ -4,6 +4,8 @@ Name: Josefa Osorio, Herman Tong, Jessica Hardey
 Netid: josorio2, ktong1
 */
 
+#include "network_utils.h"
+
 #include <unistd.h>
 #include <cstdio>
 #include <cstdlib>
