@@ -12,3 +12,6 @@ myftpd: myftpd.cpp myftpd.h
 
 myftp: myftp.cpp myftp.h
 	$(CXX) $(CXFLAGS) -o $@ $<
+
+clean:
+	rm $(TARGETS)
