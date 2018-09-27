@@ -45,4 +45,12 @@ void upload_file (int sockfd, std::vector<std::string> args) {
         return;
     }
 
+    // Send file size
+    if (send_file_size(sockfd, (uint32_t)file_stat.st_size) < 0) {
+        std::cerr << "Client fails to send file size to server" << std::endl;
+        return;
+    }
+
+    std::cout << get_file_md5(filename) << std::endl;
+    std::cout << file_stat.st_size << std::endl;
 }
