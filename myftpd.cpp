@@ -71,7 +71,11 @@ void handle_ftp_requests(int fd) {
             return;
         }
 
-        if (!strcmp(buf, "EXIT")) {
+        std::cout << buf << "-" << std::endl;
+
+        if (!strcmp(buf, "UP")) {
+            receive_upload_file(fd, buf);
+        } else if (!strcmp(buf, "EXIT")) {
             running = false;
         } else {
             printf("%s\n", buf);
