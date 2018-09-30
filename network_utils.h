@@ -7,7 +7,9 @@
 #include <string>
 #include <cstring>
 #include <cstdio>
+#include <sstream>
 #include <iostream>
+#include <fstream>
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -35,4 +37,13 @@ int recv_filename(int sockfd, std::string &filename);
 int send_file_size(int sockfd, uint32_t size);
 int recv_file_size(int sockfd, uint32_t &size);
 
+/*
+ * Send and receive binary files
+ */
+int send_file(int sockfd, std::string filename);
+int recv_file(int sockfd, uint32_t size, std::string filename);
+
+/*
+ * Generate the md5 hash
+ */
 std::string get_file_md5(std::string filename);

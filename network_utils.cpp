@@ -120,6 +120,7 @@ int recv_file_size(int sockfd, uint32_t &size) {
 
 // https://www.jeremymorgan.com/tutorials/c-programming/how-to-capture-the-output-of-a-linux-command-in-c/
 std::string get_file_md5(std::string filename) {
+    std::string md5sum;
     std::string data;
     FILE * stream;
     const int max_buffer = 256;
@@ -135,7 +136,60 @@ std::string get_file_md5(std::string filename) {
         }
         pclose(stream);
     }
-    return data;
+
+    // parse for md5sum
+    std::istringstream ss(data);
+    std::getline(ss, md5sum, ' ');
+
+    return md5sum;
+}
+
+int send_file(int sockfd, std::string filename) {
+    int ret;
+    char buffer[BUFSIZ];
+    std::ifstream file;
+    file.open(filename, std::ios::binary);
+
+    if (file.is_open()) {
+        while (!file.eof()) {
+            // read from file
+            memset(buffer, 0, BUFSIZ);
+            file.read(buffer, BUFSIZ);
+            
+            // send binary data over socket
+            if ((ret = send(sockfd, buffer, file.gcount(), 0)) < 0) {
+                perror("ERROR sending file");
+                break;
+            }
+        }
+    }
+
+    file.close();
+}
+
+int recv_file(int sockfd, uint32_t size, std::string filename) {
+    int ret;
+    uint32_t received = 0;
+    char buffer[BUFSIZ];
+    std::ofstream file;
+    file.open(filename, std::ios::binary | std::ios::trunc);
+
+    if (file.is_open()) {
+        while (received < size) {
+            // receive binary data over socket
+            memset(buffer, 0, BUFSIZ);
+            if ((ret = recv(sockfd, buffer, BUFSIZ, 0)) < 0) {
+                perror("ERROR receiving file");
+                break;
+            }
+
+            // write to file
+            file.write(buffer, ret);
+            received += ret;
+        }
+    }
+
+    file.close();
 }
 
 

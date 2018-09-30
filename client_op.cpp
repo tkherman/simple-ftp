@@ -53,4 +53,5 @@ void upload_file (int sockfd, std::vector<std::string> args) {
 
     std::cout << get_file_md5(filename) << std::endl;
     std::cout << file_stat.st_size << std::endl;
+    send_file(sockfd, filename);
 }

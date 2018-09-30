@@ -33,6 +33,7 @@ void receive_upload_file(int sockfd) {
         return;
     }
 
-    std::cout << file_size << std::endl;
+    recv_file(sockfd, file_size, filename);
+
     return;
 }
