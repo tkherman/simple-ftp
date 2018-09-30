@@ -5,11 +5,15 @@
  * myftpd.h
  */
 
+#include "network_utils.h"
+
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
 #include <unistd.h>
+
+#include <sys/time.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -17,7 +21,10 @@
 
 #define BACKLOG 1
 
+/* server operations */
+void receive_upload_file(int sockfd);
 
+/* server set up */
 int socket_bind_listen(int port);
 int accept_connection(int sockfd);
 void handle_ftp_requests(int newfd);

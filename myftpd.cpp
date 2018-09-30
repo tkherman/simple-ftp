@@ -61,24 +61,23 @@ int accept_connection(int sockfd) {
 }
 
 void handle_ftp_requests(int fd) {
+    std::string op;
     bool running = true;
-    char buf[BUFSIZ];
-    
     while (running) {
-        memset(&buf, 0, BUFSIZ);
-        if ((recv(fd, buf, BUFSIZ-1, 0)) < 0) {
-            perror("ERROR in recving message");
-            return;
+        if (recv_string(fd, op) < 0) {
+            std::cerr << "Error receiving operation" << std::endl;
+            continue;
         }
 
-        if (!strcmp(buf, "EXIT")) {
-            running = false;
-        } else {
-            printf("%s\n", buf);
-            fflush(stdout);
+        if (!op.compare("UP")) {
+            receive_upload_file(fd);
         }
+        else if (!op.compare("EXIT")) {
+            running = false;
+        }
+
     }
-    printf("\n");
+    std::cout << std::endl;
 }
 
 int main(int argc, char** argv) {

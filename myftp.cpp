@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
 
     if (argc != 3)
     {
-        fprintf(stderr, "usage: wrong number of arguments\n");
+        std::cerr << "usage: wrong number of arguments" << std::endl;
         exit(1);
     }
     host = argv[1];
@@ -109,6 +109,7 @@ int main(int argc, char* argv[])
             case DL:
                 break;
             case UP:
+                upload_file(sockfd, command_arguments);
                 break;
             case RM:
                 break;
@@ -121,11 +122,8 @@ int main(int argc, char* argv[])
             case CD:
                 break;
             case EXIT:
-                strcpy(buf, "EXIT");
-                if ((send(sockfd, buf, strlen(buf), 0)) < 0) {
-                    std::cerr << "Failed to send message" << std::endl;
+                if (send_string(sockfd, std::string("EXIT")) != 0)
                     continue;
-                }
                 running = false;
                 std::cout << "Closing connection" << std::endl;
                 break;
