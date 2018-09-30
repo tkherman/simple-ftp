@@ -11,6 +11,7 @@
 #include <iostream>
 #include <fstream>
 
+#include <sys/time.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -47,3 +48,9 @@ int recv_file(int sockfd, uint32_t size, std::string filename);
  * Generate the md5 hash
  */
 std::string get_file_md5(std::string filename);
+
+/*
+ * Get time elasped in microseconds
+ * Take 2 struct timeeval as input
+ */
+int get_time_elasped(struct timeval start_time, struct timeval end_time);

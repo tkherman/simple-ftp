@@ -192,7 +192,9 @@ int recv_file(int sockfd, uint32_t size, std::string filename) {
     file.close();
 }
 
-
+int get_time_elasped(struct timeval st, struct timeval et) {
+    return (((et.tv_sec - st.tv_sec) * 1000000) + (et.tv_usec - st.tv_usec));
+}
 
 
 

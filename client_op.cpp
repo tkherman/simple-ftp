@@ -12,6 +12,9 @@ void upload_file (int sockfd, std::vector<std::string> args) {
     struct stat file_stat;
     std::string filename;
     std::string ret_filename;
+    std::string md5sum;
+    std::string ret_md5sum;
+    uint32_t throughput;
     char buffer[BUFSIZ];
 
     // Check if input file exists
@@ -25,6 +28,9 @@ void upload_file (int sockfd, std::vector<std::string> args) {
         std::cerr << "File specified: " << filename << " doesn't exist" << std::endl;
         return;
     }
+
+    // Get md5sum
+    md5sum = get_file_md5(filename);
     
     // Send UP request to server
     if (send_string(sockfd, std::string("UP")) < 0) {
@@ -51,7 +57,28 @@ void upload_file (int sockfd, std::vector<std::string> args) {
         return;
     }
 
-    std::cout << get_file_md5(filename) << std::endl;
-    std::cout << file_stat.st_size << std::endl;
-    send_file(sockfd, filename);
+    // Send file
+    if (send_file(sockfd, filename) < 0) {
+        std::cerr << "Client fails to send file to server" << std::endl;
+        return;
+    }
+
+    // Recv checksum
+    if (recv_string(sockfd, ret_md5sum) < 0) {
+        std::cerr << "Client fails to receive md5checksum" << std::endl;
+    }
+
+
+    // Recv throughput
+    if (recv_file_size(sockfd, throughput) < 0) {
+        std::cerr << "Client fails to receive throughput" << std::endl;
+    }
+
+    if (md5sum.compare(ret_md5sum)) {
+        std::cout << "Upload fails: md5sum returned is different, upload failed" << std::endl;
+    } else {
+        std::cout << "Upload successful" << std::endl;
+        std::cout << "Throughput: " << throughput << " bytes/second" << std::endl;
+        std::cout << "Md5sum: " << md5sum << std::endl;
+    }
 }

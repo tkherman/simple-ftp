@@ -71,7 +71,6 @@ void handle_ftp_requests(int fd) {
 
         if (!op.compare("UP")) {
             receive_upload_file(fd);
-            running = false;
         }
         else if (!op.compare("EXIT")) {
             running = false;
