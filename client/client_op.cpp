@@ -7,6 +7,25 @@
 
 #include "myftp.h"
 
+void get_ls(int sockfd) {
+    uint32_t size;
+    std::string listing;
+
+    // Send LS request to server
+    if (send_string(sockfd, std::string("LS")) < 0) {
+        std::cerr << "Client fails to send LS request" << std::endl;
+        return;
+    }
+
+    // Recv listing length
+    if (recv_string(sockfd, listing) < 0) {
+        std::cerr << "Client fails to receive listing" << std::endl;
+        return;
+    }
+
+    std::cout << listing << std::endl;
+    return;
+}
 
 void upload_file (int sockfd, std::vector<std::string> args) {
     struct stat file_stat;
@@ -82,3 +101,5 @@ void upload_file (int sockfd, std::vector<std::string> args) {
         std::cout << "Md5sum: " << md5sum << std::endl;
     }
 }
+
+

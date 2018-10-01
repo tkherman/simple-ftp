@@ -64,6 +64,7 @@ void handle_ftp_requests(int fd) {
     std::string op;
     bool running = true;
     while (running) {
+        op = std::string();
         if (recv_string(fd, op) < 0) {
             std::cerr << "Error receiving operation" << std::endl;
             continue;
@@ -71,6 +72,9 @@ void handle_ftp_requests(int fd) {
 
         if (!op.compare("UP")) {
             receive_upload_file(fd);
+        }
+        else if (!op.compare("LS")) {
+            service_ls_request(fd);
         }
         else if (!op.compare("EXIT")) {
             running = false;
