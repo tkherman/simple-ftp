@@ -5,7 +5,7 @@
  * myftpd.h
  */
 
-#include "network_utils.h"
+#include "../network_utils/network_utils.h"
 
 #include <cstdio>
 #include <cstdlib>

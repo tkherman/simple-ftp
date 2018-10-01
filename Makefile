@@ -3,30 +3,30 @@
 
 CXX=		g++
 CXFLAGS=	-g -std=c++11
-TARGETS=	myftpd myftp
+TARGETS=	bin/myftpd bin/myftp
 
 all: $(TARGETS)
 
-myftpd: myftpd.o server_op.o network_utils.o
+bin/myftpd: bin/myftpd.o bin/server_op.o bin/network_utils.o
 	$(CXX) $(CXFLAGS) -o $@ $^
 
-myftp: myftp.o client_op.o network_utils.o
+bin/myftp: bin/myftp.o bin/client_op.o bin/network_utils.o
 	$(CXX) $(CXFLAGS) -o $@ $^
 
-myftpd.o: myftpd.cpp myftpd.h
+bin/myftpd.o: server/myftpd.cpp server/myftpd.h
 	$(CXX) $(CXFLAGS) -o $@ -c $<
 
-server_op.o: server_op.cpp myftp.h
+bin/server_op.o: server/server_op.cpp server/myftpd.h
 	$(CXX) $(CXFLAGS) -o $@ -c $<
 
-myftp.o: myftp.cpp myftp.h
+bin/myftp.o: client/myftp.cpp client/myftp.h
 	$(CXX) $(CXFLAGS) -o $@ -c $<
 
-client_op.o: client_op.cpp myftp.h
+bin/client_op.o: client/client_op.cpp client/myftp.h
 	$(CXX) $(CXFLAGS) -o $@ -c $<
 
-network_utils.o: network_utils.cpp network_utils.h
+bin/network_utils.o: network_utils/network_utils.cpp network_utils/network_utils.h
 	$(CXX) $(CXFLAGS) -o $@ -c $<
 
 clean:
-	rm $(TARGETS) *.o
+	rm $(TARGETS) bin/*.o
