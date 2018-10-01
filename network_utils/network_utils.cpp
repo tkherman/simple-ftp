@@ -66,7 +66,7 @@ int send_filename(int sockfd, std::string filename) {
     uint16_t filename_len;
 
     // send filename length
-    filename_len = htons((uint16_t)filename.size());
+    filename_len = filename.size();
     if ((ret = send(sockfd, &filename_len, sizeof(uint16_t), 0)) < 0) {
         perror("ERROR sending filename length");
         return ret;
@@ -93,7 +93,7 @@ int recv_filename(int sockfd, std::string &filename) {
         return ret;
     }
     memcpy(&filename_len, buffer, sizeof(uint16_t));
-    
+
     // recv filename
     if ((ret = recv(sockfd, buffer, (size_t)filename_len, 0)) < 0) {
         perror("ERROR recving filename");
@@ -106,7 +106,7 @@ int recv_filename(int sockfd, std::string &filename) {
 
 int send_file_size(int sockfd, uint32_t size) {
     int ret;
-    
+
     // send 32-bit file size
     size = htonl(size);
     if ((ret = send(sockfd, &size, sizeof(uint32_t), 0)) < 0)
@@ -169,7 +169,7 @@ int send_file(int sockfd, std::string filename) {
             // read from file
             memset(buffer, 0, BUFSIZ);
             file.read(buffer, BUFSIZ);
-            
+
             // send binary data over socket
             if ((ret = send(sockfd, buffer, file.gcount(), 0)) < 0) {
                 perror("ERROR sending file");
@@ -209,22 +209,3 @@ int recv_file(int sockfd, uint32_t size, std::string filename) {
 int get_time_elasped(struct timeval st, struct timeval et) {
     return (((et.tv_sec - st.tv_sec) * 1000000) + (et.tv_usec - st.tv_usec));
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

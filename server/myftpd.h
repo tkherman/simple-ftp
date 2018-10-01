@@ -1,5 +1,5 @@
 /*
- * Name: Kwan Ho Herman Tong, Jessica Hardey, Josefa O'Sorio
+ * Name: Kwan Ho Herman Tong, Jessica Hardey, Josefa Osorio
  * NetId: ktong1, jhardey, josorio2
  *
  * myftpd.h
