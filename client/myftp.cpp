@@ -113,11 +113,13 @@ int main(int argc, char* argv[])
                 upload_file(sockfd, command_arguments);
                 break;
             case RM:
+                remove_file(sockfd, command_arguments);
                 break;
             case LS:
                 get_ls(sockfd);
                 break;
             case MKDIR:
+                make_directory(sockfd, command_arguments);
                 break;
             case RMDIR:
                 break;

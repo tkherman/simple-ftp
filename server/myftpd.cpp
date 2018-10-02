@@ -79,6 +79,12 @@ void handle_ftp_requests(int fd) {
         else if (!op.compare("DL")) {
             send_download_file(fd);
         }
+        else if (!op.compare("MKDIR")){
+            service_mkdir_request(fd);
+        }
+        else if (!op.compare("RM")){
+            service_rm_request(fd);
+        }
         else if (!op.compare("EXIT")) {
             running = false;
         }
