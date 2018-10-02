@@ -39,4 +39,5 @@ enum Operation {
 int socket_connect(char *host, int port);
 Operation parse_input(std::vector<std::string> &arguments);
 void upload_file (int sockfd, std::vector<std::string> args);
+void get_ls(int sockfd);
 void download_file(int sockfd, std::vector<std::string> args);

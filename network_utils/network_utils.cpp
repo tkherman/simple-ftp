@@ -29,6 +29,7 @@ int send_string(int sockfd, std::string msg) {
 int recv_string(int sockfd, std::string &msg) {
     int ret;
     size_t len;
+    size_t received = 0;
     char buffer[BUFSIZ];
 
     // recv length of msg
@@ -39,11 +40,24 @@ int recv_string(int sockfd, std::string &msg) {
     }
     memcpy(&len, buffer, sizeof(size_t));
 
+    /*
     if ((ret = recv(sockfd, buffer, len, 0)) < 0) {
         perror("ERROR recving string message");
         return ret;
     }
     msg = std::string(buffer);
+    */
+
+    while (received < len) {
+        memset(buffer, 0, BUFSIZ);
+        if ((ret = recv(sockfd, buffer, len, 0)) < 0) {
+            perror("ERROR receiving string");
+            return ret;
+        }
+        received += ret;
+        msg.append(std::string(buffer));
+    }
+
     return ret;
 }
 

@@ -115,6 +115,7 @@ int main(int argc, char* argv[])
             case RM:
                 break;
             case LS:
+                get_ls(sockfd);
                 break;
             case MKDIR:
                 break;
@@ -123,7 +124,7 @@ int main(int argc, char* argv[])
             case CD:
                 break;
             case EXIT:
-                if (send_string(sockfd, std::string("EXIT")) != 0)
+                if (send_string(sockfd, std::string("EXIT")) < 0)
                     continue;
                 running = false;
                 std::cout << "Closing connection" << std::endl;

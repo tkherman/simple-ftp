@@ -7,6 +7,38 @@
 
 #include "myftpd.h"
 
+std::string get_dir_listing() {
+    std::string listing;
+    FILE * stream;
+    const int max_buffer = 256;
+    char buffer[max_buffer];
+    std::string cmd("ls -l");
+
+    stream = popen(cmd.c_str(), "r");
+    if (stream) {
+        while(!feof(stream)) {
+            if (fgets(buffer, max_buffer, stream) != NULL)
+                listing.append(buffer);
+        }
+        pclose(stream);
+    }
+
+    return listing;
+}
+
+void service_ls_request(int sockfd) {
+    std::string listing;
+
+    // Get and send listing
+    listing = get_dir_listing();
+    if (send_string(sockfd, listing) < 0) {
+        std::cerr << "Server fails to send lising" << std::endl;
+        return;
+    }
+
+    return;
+}
+
 void receive_upload_file(int sockfd) {
     std::string filename;
     std::string md5sum;
