@@ -46,7 +46,7 @@ void receive_upload_file(int sockfd) {
     uint32_t file_size;
     struct timeval st, et;
     int time_elasped;
-    
+
     // Get filename from client
     if(recv_filename(sockfd, filename) < 0) {
         std::cerr << "Server failed to get filename from client" << std::endl;
@@ -77,7 +77,7 @@ void receive_upload_file(int sockfd) {
     gettimeofday(&et, NULL);
     time_elasped = get_time_elasped(st, et);
     throughput = (file_size * 1000000) / time_elasped;
-    
+
     std::cout << "Received file from client: " << filename << std::endl;
 
     // Calculate md5sum, then send md5 sum and throughput to client
@@ -93,4 +93,48 @@ void receive_upload_file(int sockfd) {
     }
 
     return;
+}
+
+void send_download_file(int sockfd) {
+    struct stat file_stat;
+    std::string filename;
+    std::string md5sum;
+    uint32_t throughput;
+    uint32_t file_size;
+
+    // Get filename from client
+    if(recv_filename(sockfd, filename) < 0) {
+        std::cerr << "Server failed to get filename from client" << std::endl;
+        return;
+    }
+
+    // Receive file size from client
+    if (recv_file_size(sockfd, file_size) < 0) {
+        std::cerr << "Server fails to receive file size from client" << std::endl;
+        return;
+    }
+
+    // check if file exists
+    if (stat(filename.c_str(), &file_stat) != 0) {
+        std::cerr << "File specified: " << filename << " doesn't exist" << std::endl;
+        return;
+    }
+
+    md5sum = get_file_md5(filename);
+    if (send_string(sockfd, md5sum) < 0) {
+        std::cerr << "Server failed to send md5sum to client" << std::endl;
+        return;
+    }
+
+    // Send file size
+    if (send_file_size(sockfd, (uint32_t)file_stat.st_size) < 0) {
+        std::cerr << "Server fails to send file size to client" << std::endl;
+        return;
+    }
+
+    // Send file
+    if (send_file(sockfd, filename) < 0) {
+        std::cerr << "Client fails to send file to server" << std::endl;
+        return;
+    }
 }

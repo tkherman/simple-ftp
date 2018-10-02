@@ -17,6 +17,7 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
@@ -31,3 +32,4 @@ void service_ls_request(int sockfd);
 int socket_bind_listen(int port);
 int accept_connection(int sockfd);
 void handle_ftp_requests(int newfd);
+void send_download_file(int sockfd);
