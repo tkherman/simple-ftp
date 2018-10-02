@@ -29,7 +29,7 @@ int socket_connect(char *host, int port) {
         perror("socket error\n");
         return -1;
     }
-    
+
     printf("Connecting to %s\n", host);
     if (connect(s, (struct sockaddr *)&sin, sizeof(sin)) < 0)
     {
@@ -107,6 +107,7 @@ int main(int argc, char* argv[])
 
         switch(op) {
             case DL:
+                download_file(sockfd, command_arguments);
                 break;
             case UP:
                 upload_file(sockfd, command_arguments);
@@ -128,11 +129,7 @@ int main(int argc, char* argv[])
                 std::cout << "Closing connection" << std::endl;
                 break;
         }
-    }    
+    }
 
     close(sockfd);
 }
-
-
-
-
