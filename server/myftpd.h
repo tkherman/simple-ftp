@@ -31,6 +31,7 @@ std::string get_dir_listing();
 void service_ls_request(int sockfd);
 void service_mkdir_request(int sockfd);
 void service_rm_request(int sockfd);
+void service_cd_request(int sockfd);
 
 /* server set up */
 int socket_bind_listen(int port);

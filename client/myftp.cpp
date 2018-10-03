@@ -1,7 +1,7 @@
 /*
 File: myftp.cpp
 Name: Josefa Osorio, Herman Tong, Jessica Hardey
-Netid: josorio2, ktong1
+Netid: josorio2, ktong1, jhardey
 */
 
 #include "myftp.h"
@@ -124,6 +124,7 @@ int main(int argc, char* argv[])
             case RMDIR:
                 break;
             case CD:
+                change_directory(sockfd, command_arguments);
                 break;
             case EXIT:
                 if (send_string(sockfd, std::string("EXIT")) < 0)
