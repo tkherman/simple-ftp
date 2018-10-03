@@ -40,14 +40,6 @@ int recv_string(int sockfd, std::string &msg) {
     }
     memcpy(&len, buffer, sizeof(size_t));
 
-    /*
-    if ((ret = recv(sockfd, buffer, len, 0)) < 0) {
-        perror("ERROR recving string message");
-        return ret;
-    }
-    msg = std::string(buffer);
-    */
-
     while (received < len) {
         memset(buffer, 0, BUFSIZ);
         if ((ret = recv(sockfd, buffer, len, 0)) < 0) {
