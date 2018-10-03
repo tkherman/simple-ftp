@@ -61,6 +61,9 @@ void receive_upload_file(int sockfd) {
         std::cerr << "Failed to resend filename back to client" << std::endl;
         return;
     }
+    
+    // Turn filepath into filename
+    filename = filename.substr(filename.find_last_of('/')+1, filename.size()-filename.find_last_of('/')+1);
 
     // Receive file size from client
     if (recv_file_size(sockfd, file_size) < 0) {
@@ -154,6 +157,11 @@ void service_rm_request(int sockfd){
         return;
     }
 
+    if (stat(filename.c_str(), &file_stat) != 0)
+        std::cout << "file doesn't exist" << std::endl;
+    else if (file_stat.st_mode & S_IFDIR)
+        std::cout << "it's a dir" << std::endl;
+
     // Checks if file exists and isn't a directory
     if (stat(filename.c_str(), &file_stat) != 0  || (file_stat.st_mode & S_IFDIR)) {
         // Send client negative confirm integer - file doesn't exist
@@ -223,6 +231,10 @@ void service_rmdir_request(int sockfd) {
         std::cerr << "Server fails to send directory status to client" << std::endl;
         return;
     }
+
+    // End operation if directory cannot be deleted
+    if (dir_status != 1)
+        return;
 
     // Get delete confirmation
     if (recv_string(sockfd, confirmation) < 0) {

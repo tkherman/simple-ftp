@@ -217,7 +217,6 @@ int recv_file(int sockfd, uint32_t size, std::string filename) {
             }
             // write to file
             file.write(buffer, ret);
-            std::cout << "ret: " << ret << std::endl;
             received += ret;
         }
     }
