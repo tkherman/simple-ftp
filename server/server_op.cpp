@@ -205,6 +205,42 @@ void service_rm_request(int sockfd){
     return;
 }
 
+void service_rmdir_request(int sockfd) {
+    std::string dir_name;
+    std::string confirmation;
+    int dir_status;
+    struct stat info;
+
+    // Receive directory name from client
+    if (recv_filename(sockfd, dir_name) < 0) {
+        std::cerr << "Server fails to receive directory name from client" << std::endl;
+        return;
+    }
+
+    // Check if directory exist and if it's empty
+    dir_status = get_dir_info(dir_name);
+    if (send_string(sockfd, std::to_string(dir_status)) < 0) {
+        std::cerr << "Server fails to send directory status to client" << std::endl;
+        return;
+    }
+
+    // Get delete confirmation
+    if (recv_string(sockfd, confirmation) < 0) {
+        std::cerr << "Server fails to receive delete confirmation" << std::endl;
+        return;
+    }
+
+    if (!confirmation.compare("No"))
+        return;
+
+    if (send_string(sockfd, std::to_string(rmdir(dir_name.c_str()))) < 0) {
+        std::cerr << "Server fails to send delete ack" << std::endl;
+        return;
+    }
+
+    return;
+}
+
 void send_download_file(int sockfd) {
     struct stat file_stat;
     std::string filename;

@@ -150,6 +150,29 @@ std::string get_file_md5(std::string filename) {
     return md5sum;
 }
 
+int get_dir_info(std::string dir_name) {
+    int n = 0;
+    struct dirent *d;
+    DIR *dir = opendir(dir_name.c_str());
+
+    // Directory doesn't exist or is not a directory
+    if (dir == NULL)
+        return -1;
+
+    while ((d = readdir(dir)) != NULL) {
+        if (++n > 2)
+            break;
+    }
+
+    closedir(dir);
+    // Empty directory since it only consist of . and ..
+    if (n <= 2)
+        return 1;
+    // Not empty
+    else
+        return -2;
+}
+
 int send_file(int sockfd, std::string filename) {
     int ret;
     char buffer[BUFSIZ];

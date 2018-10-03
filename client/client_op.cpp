@@ -223,6 +223,70 @@ void remove_file(int sockfd, std::vector<std::string> args){
     return;
 }
 
+void remove_directory(int sockfd, std::vector<std::string> args) {
+    std::string dir_name;
+    std::string ack;
+    std::string confirmation;
+    std::string user_input;
+
+    // send RMDIR request to server
+    if (send_string(sockfd, std::string("RMDIR")) < 0) {
+        std::cerr << "Client fails to send RMDIR request to server" << std::endl;
+        return;
+    }
+
+    // Send directory name to server
+    dir_name = args[0];
+    if (send_filename(sockfd, dir_name) < 0) {
+        std::cerr << "Client fails to send directory name to server" << std::endl;
+        return;
+    }
+
+    // Receive confirmation from server
+    if (recv_string(sockfd, confirmation) < 0) {
+        std::cerr << "Client fails to receive confirmation from server" << std::endl;
+        return;
+    }
+
+    // Directory doesn't exist
+    if (!confirmation.compare("-1")) {
+        std::cout << "The directory does not exist on server" << std::endl;
+        return;
+    // Directory is not empty
+    } else if (!confirmation.compare("-2")){
+        std::cout << "The directory is not empty" << std::endl;
+        return;
+    }
+
+    // Ask user to confirm deletion
+    std::cout << "Do you wish to delete " << dir_name << ". Yes to delete, No to ignore > ";
+    std::cin >> user_input;
+
+    if (send_string(sockfd, user_input) < 0) {
+        std::cerr << "Client fails to send confirmation to server" << std::endl;
+        return;
+    }
+
+    // User abandons rmdir
+    if (!user_input.compare("NO")) {
+        std::cout << "Delete abandoned by the user!" << std::endl;
+        return;
+    }
+
+    // Receive rmdir ack
+    if (recv_string(sockfd, ack) < 0) {
+        std::cerr << "Client fails to receive delete ack" << std::endl;
+        return;
+    }
+
+    if (!ack.compare("-1"))
+        std::cout << "Failed to delete directory" << std::endl;
+    else
+        std::cout << "Directory deleted" << std::endl;
+
+    return;
+}
+
 void download_file(int sockfd, std::vector<std::string> args) {
     std::string filename;
     std::string ret_filename;

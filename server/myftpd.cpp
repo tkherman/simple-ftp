@@ -85,6 +85,9 @@ void handle_ftp_requests(int fd) {
         else if (!op.compare("RM")){
             service_rm_request(fd);
         }
+        else if (!op.compare("RMDIR")) {
+            service_rmdir_request(fd);
+        }
         else if (!op.compare("EXIT")) {
             running = false;
         }

@@ -122,6 +122,7 @@ int main(int argc, char* argv[])
                 make_directory(sockfd, command_arguments);
                 break;
             case RMDIR:
+                remove_directory(sockfd, command_arguments);
                 break;
             case CD:
                 break;
