@@ -108,9 +108,7 @@ int send_file_size(int sockfd, uint32_t size) {
     int ret;
 
     // send 32-bit file size
-    std::cout << "size in send_file_size: " << size << std::endl;
-    // size = htonl(size);
-    // std::cout << "size in send_file_size after htonl: " << size << std::endl;
+    size = htonl(size);
     if ((ret = send(sockfd, &size, sizeof(uint32_t), 0)) < 0)
         perror("ERROR sending 32-bit file size");
 
@@ -121,7 +119,6 @@ int recv_file_size(int sockfd, uint32_t &size) {
     int ret;
     uint32_t temp_size;
     char buffer[BUFSIZ];
-    // std::cout << "size in recv_file_size: " << size << std::endl;
 
     // recv 32-bit file size
     memset(buffer, 0, BUFSIZ);
@@ -130,9 +127,7 @@ int recv_file_size(int sockfd, uint32_t &size) {
         return ret;
     }
     memcpy(&temp_size, buffer, sizeof(uint32_t));
-    size = temp_size;
-    std::cout << "temp_size in recv_file_size after recv: " << temp_size << std::endl;
-    std::cout << "ntohl size in recv_file_size after recv: " << size << std::endl;
+    size = ntohl(temp_size);
 
     return ret;
 }
@@ -174,7 +169,6 @@ int send_file(int sockfd, std::string filename) {
             // read from file
             memset(buffer, 0, BUFSIZ);
             file.read(buffer, BUFSIZ);
-
             // send binary data over socket
             if ((ret = send(sockfd, buffer, file.gcount(), 0)) < 0) {
                 perror("ERROR sending file");
@@ -189,24 +183,26 @@ int recv_file(int sockfd, uint32_t size, std::string filename) {
     int ret;
     uint32_t received = 0;
     char buffer[BUFSIZ];
-    std::ofstream file;
-    file.open(filename, std::ios::binary | std::ios::trunc);
 
-    std::cout << "In recv_file" << std::endl;
-    std::cout << "filename: " << filename << " size: " << size << std::endl;
+    // Strips filename of path
+    size_t back_slash_pos = filename.find_last_of("/");
+    if (back_slash_pos != std::string::npos){
+        filename = filename.substr(back_slash_pos+1);
+    }
+
+    std::ofstream file(filename, std::iostream::out | std::ios::binary);
 
     if (file.is_open()) {
         while (received < size) {
             // receive binary data over socket
-            std::cout << "received: " << received << " size: " << size << std::endl;
             memset(buffer, 0, BUFSIZ);
             if ((ret = recv(sockfd, buffer, BUFSIZ, 0)) < 0) {
                 perror("ERROR receiving file");
                 break;
             }
             // write to file
-            std::cout << "buffer: " << buffer << std::endl;
             file.write(buffer, ret);
+            std::cout << "ret: " << ret << std::endl;
             received += ret;
         }
     }

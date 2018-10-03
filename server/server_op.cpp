@@ -95,6 +95,289 @@ void receive_upload_file(int sockfd) {
     return;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 void send_download_file(int sockfd) {
     struct stat file_stat;
     std::string filename;
@@ -108,8 +391,6 @@ void send_download_file(int sockfd) {
         return;
     }
 
-    std::cout << "received filename: " << filename << std::endl;
-
     // check if file exists
     if (stat(filename.c_str(), &file_stat) != 0) {
         if (send_file_size(sockfd, (uint32_t)-1) < 0) {
@@ -120,13 +401,6 @@ void send_download_file(int sockfd) {
         return;
     }
 
-    md5sum = get_file_md5(filename);
-    std::cout << "md5sum: " << md5sum << std::endl;
-    if (send_string(sockfd, md5sum) < 0) {
-        std::cerr << "Server failed to send md5sum to client" << std::endl;
-        return;
-    }
-
     // Send file size
     std::cout << "file_size: " << (uint32_t)file_stat.st_size << std::endl;
     if (send_file_size(sockfd, (uint32_t)file_stat.st_size) < 0) {
@@ -134,7 +408,12 @@ void send_download_file(int sockfd) {
         return;
     }
 
-    std::cout << "after sending filesize" << std::endl;
+    md5sum = get_file_md5(filename);
+    std::cout << "md5sum: " << md5sum << std::endl;
+    if (send_string(sockfd, md5sum) < 0) {
+        std::cerr << "Server failed to send md5sum to client" << std::endl;
+        return;
+    }
 
     // Send file
     if (send_file(sockfd, filename) < 0) {
@@ -142,6 +421,5 @@ void send_download_file(int sockfd) {
         return;
     }
 
-    std::cout << "after sending file" << std::endl;
     return;
 }

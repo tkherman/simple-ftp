@@ -102,6 +102,316 @@ void upload_file (int sockfd, std::vector<std::string> args) {
     }
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 void download_file(int sockfd, std::vector<std::string> args) {
     std::string filename;
     std::string ret_filename;
@@ -135,23 +445,25 @@ void download_file(int sockfd, std::vector<std::string> args) {
         return;
     }
 
+
     // recv file size from server
     if (recv_file_size(sockfd, file_size) < 0) {
-        if (file_size == (uint32_t)-1) {
-            std::cerr << "Specified file: " << filename << " does not exist on server." << std::endl;
-            return;
-        }
         std::cerr << "Client fails to receive file size from server" << std::endl;
         return;
     }
-    std::cout << "file size after received: " << file_size << std::endl;
+
+    if (file_size == (uint32_t)-1) {
+        std::cerr << "Specified file: " << filename << " does not exist on server." << std::endl;
+        return;
+    }
+
+
 
     // Recv checksum
     if (recv_string(sockfd, ret_md5sum) < 0) {
         std::cerr << "Client fails to receive md5checksum" << std::endl;
         return;
     }
-     std::cout << "after returned md5sum" << std::endl;
 
 
 
@@ -161,8 +473,7 @@ void download_file(int sockfd, std::vector<std::string> args) {
         std::cerr << "Client fails to receive file from server" << std::endl;
         return;
     }
-    std::cout << "filename after recv: " << filename << std::endl;
-    std::cout << "filesize after recv: " << file_size << std::endl;
+
     gettimeofday(&et, NULL);
     time_elasped = get_time_elasped(st, et);
     throughput = (file_size * 1000000) / time_elasped;
@@ -170,7 +481,6 @@ void download_file(int sockfd, std::vector<std::string> args) {
 
     // calculate hash and compare to hash from server
     md5sum = get_file_md5(filename);
-    std::cout << "md5sum: " << md5sum << std::endl;
     if (md5sum.compare(ret_md5sum)) {
         std::cout << "Download fails: md5sum returned is different, download failed" << std::endl;
     } else {
@@ -178,6 +488,7 @@ void download_file(int sockfd, std::vector<std::string> args) {
         std::cout << "Throughput: " << throughput << " bytes/second" << std::endl;
         std::cout << "Md5sum: " << md5sum << std::endl;
     }
+
     return;
 
 }
