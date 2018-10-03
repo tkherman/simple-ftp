@@ -1,7 +1,7 @@
 /*
 File: myftp.h
 Name: Josefa Osorio, Herman Tong, Jessica Hardey
-Netid: josorio2, ktong1
+Netid: josorio2, ktong1, jhardey
 */
 
 #include "../network_utils/network_utils.h"
@@ -38,6 +38,11 @@ enum Operation {
 
 int socket_connect(char *host, int port);
 Operation parse_input(std::vector<std::string> &arguments);
+
 void upload_file (int sockfd, std::vector<std::string> args);
 void get_ls(int sockfd);
+void make_directory(int sockfd, std::vector<std::string> args);
+void remove_file(int sockfd, std::vector<std::string> args);
+void remove_directory(int sockfd, std::vector<std::string> args);
 void download_file(int sockfd, std::vector<std::string> args);
+void change_directory(int sockfd, std::vector<std::string> args);

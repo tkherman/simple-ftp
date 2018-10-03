@@ -11,6 +11,7 @@
 #include <iostream>
 #include <fstream>
 
+#include <dirent.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -48,6 +49,15 @@ int recv_file(int sockfd, uint32_t size, std::string filename);
  * Generate the md5 hash
  */
 std::string get_file_md5(std::string filename);
+
+/*
+ * Check if directory exist and is empty
+ * Returns 1 if exist and empty
+ * Returns 0 if not empty
+ * returns -1 if doesn't exist
+ * https://stackoverflow.com/questions/6383584/check-if-a-directory-is-empty-using-c-on-linux
+ */
+int get_dir_info(std::string dir_name);
 
 /*
  * Get time elasped in microseconds

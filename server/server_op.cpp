@@ -1,7 +1,7 @@
 /*
  * File: server_op.cpp
  * Name: Herman Tong, Josefa Osorio, Jessica Hardey
- * Netid: ktong1, josorio2, jhardey1
+ * Netid: ktong1, josorio2, jhardey
  *
  */
 
@@ -95,288 +95,151 @@ void receive_upload_file(int sockfd) {
     return;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+void service_mkdir_request(int sockfd){
+    struct stat dir_stat;
+    std::string dir_name;
+    std::string str;
+    uint32_t file_size;
+    const char *command;
+
+    // Get directory name from client
+    if(recv_filename(sockfd, dir_name) < 0) {
+        std::cerr << "Server failed to get directory name from client" << std::endl;
+        return;
+    }
+
+
+    // Checks if directory exists
+    if (stat(dir_name.c_str(), &dir_stat) == 0 && (dir_stat.st_mode & S_IFDIR)){
+        // Send client negative confirm integer - directory already exists
+        if (send_string(sockfd, std::string("-2")) < 0) {
+            std::cerr << "Server failed sending negative confirm" << std::endl;
+            return;
+        }
+        return;
+    }
+
+    str = "mkdir " + dir_name;
+    command = str.c_str();
+    // Runs command
+    if (system(command) < 0){
+        // Sends client negative confirm integer - unable to make directory
+        if (send_string(sockfd, std::string("-1")) < 0) {
+            std::cerr << "Server failed sending negative confirm" << std::endl;
+            return;
+        }
+        return;
+    }
+
+    // Sends client positive confirm integer
+    if (send_string(sockfd, std::string("1")) < 0) {
+        std::cerr << "Server failed sending positive confirm" << std::endl;
+        return;
+    }
+
+    return;
+}
+
+void service_rm_request(int sockfd){
+    struct stat file_stat;
+    std::string filename;
+    std::string str;
+    uint32_t file_size;
+    const char *command;
+    std::string confirm;
+
+    // Get filename from client
+    if(recv_filename(sockfd, filename) < 0) {
+        std::cerr << "Server failed to get filename from client" << std::endl;
+        return;
+    }
+
+    // Checks if file exists and isn't a directory
+    if (stat(filename.c_str(), &file_stat) != 0  || (file_stat.st_mode & S_IFDIR)) {
+        // Send client negative confirm integer - file doesn't exist
+        if (send_string(sockfd, std::string("-1")) < 0) {
+            std::cerr << "Server failed sending positive confirm" << std::endl;
+            return;
+        }
+        return;
+    }
+
+    if (send_string(sockfd, std::string("1")) < 0) {
+        std::cerr << "Server failed sending positive confirm" << std::endl;
+        return;
+    }
+
+    if (recv_string(sockfd, confirm) < 0) {
+        std::cerr << "Server failed receiving confirm" << std::endl;
+        return;
+    }
+
+    // Checks confirm and sends to client if No
+    if (confirm == "No"){
+        if (send_string(sockfd, std::string("No")) < 0) {
+            std::cerr << "Server failed sending negative confirm" << std::endl;
+            return;
+        }
+        return;
+    }
+
+    // Removes file if confirm is Yes
+    str = "rm " + filename;
+    command = str.c_str();
+    // Runs command
+    if (system(command) < 0){
+        // Sends client negative confirm integer - unable to make directory
+        if (send_string(sockfd, std::string("No")) < 0) {
+            std::cerr << "Server failed sending negative confirm" << std::endl;
+            return;
+        }
+        return;
+    }
+
+    // Sends positive confirm to client
+    if (send_string(sockfd, std::string("Yes")) < 0) {
+        std::cerr << "Server failed sending positive confirm" << std::endl;
+        return;
+    }
+
+    return;
+}
+
+void service_rmdir_request(int sockfd) {
+    std::string dir_name;
+    std::string confirmation;
+    int dir_status;
+    struct stat info;
+
+    // Receive directory name from client
+    if (recv_filename(sockfd, dir_name) < 0) {
+        std::cerr << "Server fails to receive directory name from client" << std::endl;
+        return;
+    }
+
+    // Check if directory exist and if it's empty
+    dir_status = get_dir_info(dir_name);
+    if (send_string(sockfd, std::to_string(dir_status)) < 0) {
+        std::cerr << "Server fails to send directory status to client" << std::endl;
+        return;
+    }
+
+    // Get delete confirmation
+    if (recv_string(sockfd, confirmation) < 0) {
+        std::cerr << "Server fails to receive delete confirmation" << std::endl;
+        return;
+    }
+
+    if (!confirmation.compare("No"))
+        return;
+
+    if (send_string(sockfd, std::to_string(rmdir(dir_name.c_str()))) < 0) {
+        std::cerr << "Server fails to send delete ack" << std::endl;
+        return;
+    }
+
+    return;
+}
 
 void send_download_file(int sockfd) {
     struct stat file_stat;
@@ -418,6 +281,77 @@ void send_download_file(int sockfd) {
     // Send file
     if (send_file(sockfd, filename) < 0) {
         std::cerr << "Server fails to send file to server" << std::endl;
+        return;
+    }
+
+    return;
+}
+
+void service_cd_request(int sockfd){
+    struct stat dir_stat;
+    std::string dir_name;
+    uint32_t file_size;
+    std::string curr_path;
+    std::string changed_path;
+    FILE * stream;
+    const int max_buffer = 256;
+    char buffer[max_buffer];
+    std::string cmd("pwd");
+
+    // Get directory name from client
+    if(recv_filename(sockfd, dir_name) < 0) {
+        std::cerr << "Server failed to get directory name from client" << std::endl;
+        return;
+    }
+
+    // Checks if directory exists
+    if (stat(dir_name.c_str(), &dir_stat) != 0 || !(dir_stat.st_mode & S_IFDIR)){
+        // Send client negative confirm integer - directory doesn't exist
+        if (send_string(sockfd, std::string("-2")) < 0) {
+            std::cerr << "Server failed sending negative confirm" << std::endl;
+            return;
+        }
+        return;
+    }
+
+    // Gets directory before switching
+    stream = popen(cmd.c_str(), "r");
+    if (stream) {
+        while(!feof(stream)) {
+            if (fgets(buffer, max_buffer, stream) != NULL)
+                curr_path.append(buffer);
+        }
+        pclose(stream);
+    }
+
+    if (chdir(dir_name.c_str()) < 0){
+        std::cerr << "Server failed changing directory" << std::endl;
+        return;
+    }
+
+    // Gets directory after changing directory
+    stream = popen(cmd.c_str(), "r");
+    if (stream) {
+        while(!feof(stream)) {
+            if (fgets(buffer, max_buffer, stream) != NULL)
+                changed_path.append(buffer);
+        }
+        pclose(stream);
+    }
+
+    // Checks if there was an error changing directories
+    if (curr_path.compare(changed_path) == 0){
+      // Send client negative confirm integer - error changing directory
+      if (send_string(sockfd, std::string("-1")) < 0) {
+          std::cerr << "Server failed sending negative confirm" << std::endl;
+          return;
+      }
+    }
+
+
+    // Send client positive confirm integer - directory changed
+    if (send_string(sockfd, std::string("1")) < 0) {
+        std::cerr << "Server failed sending positive confirm" << std::endl;
         return;
     }
 

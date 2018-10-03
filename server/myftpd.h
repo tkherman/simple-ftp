@@ -13,7 +13,9 @@
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
+#include <stdlib.h>
 
+#include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -27,6 +29,10 @@
 void receive_upload_file(int sockfd);
 std::string get_dir_listing();
 void service_ls_request(int sockfd);
+void service_mkdir_request(int sockfd);
+void service_rm_request(int sockfd);
+void service_rmdir_request(int sockfd);
+void service_cd_request(int sockfd);
 
 /* server set up */
 int socket_bind_listen(int port);
