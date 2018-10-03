@@ -1,7 +1,7 @@
 /*
  * File: client_operation.cpp
  * Name: Herman Tong, Josefa Osorio, Jessica Hardey
- * Netid: ktong1, josorio2, jhardey1
+ * Netid: ktong1, josorio2, jhardey
  *
  */
 
@@ -355,4 +355,48 @@ void download_file(int sockfd, std::vector<std::string> args) {
         std::cout << "Throughput: " << throughput << " bytes/second" << std::endl;
         std::cout << "Md5sum: " << md5sum << std::endl;
     }
+}
+
+void change_directory(int sockfd, std::vector<std::string> args){
+    std::string dir_name;
+    std::string confirm;
+
+    // Check if directory name was input
+    if (args.size() != 1) {
+        std::cerr << "No directory name specified" << std::endl;
+        return;
+    }
+
+    dir_name = args[0];
+
+    // Send MKDIR request to server
+    if (send_string(sockfd, std::string("CD")) < 0) {
+        std::cerr << "ERROR send CD request" << std::endl;
+        return;
+    }
+
+    // Send directory name to server
+    if (send_filename(sockfd, dir_name) < 0) {
+        std::cerr << "Client fails to send directory name to server" << std::endl;
+        return;
+    }
+
+    // Receive Confirm int
+    if (recv_string(sockfd, confirm) < 0) {
+        std::cerr << "Client fails to receive confirm" << std::endl;
+    }
+
+    switch (stoi(confirm)){
+      case -2:
+          std::cerr << "The directory does not exist on server" << std::endl;
+          break;
+      case -1:
+          std::cerr << "Error in changing directory" << std::endl;
+          break;
+      case 1:
+          std::cout << "Changed current directory" << std::endl;
+          break;
+    }
+
+    return;
 }
