@@ -1,7 +1,7 @@
 /*
 File: myftp.h
 Name: Josefa Osorio, Herman Tong, Jessica Hardey
-Netid: josorio2, ktong1
+Netid: josorio2, ktong1, jhardey
 */
 
 #include "../network_utils/network_utils.h"
@@ -43,3 +43,4 @@ void get_ls(int sockfd);
 void make_directory(int sockfd, std::vector<std::string> args);
 void remove_file(int sockfd, std::vector<std::string> args);
 void download_file(int sockfd, std::vector<std::string> args);
+void change_directory(int sockfd, std::vector<std::string> args);
