@@ -108,33 +108,40 @@ void send_download_file(int sockfd) {
         return;
     }
 
-    // Receive file size from client
-    if (recv_file_size(sockfd, file_size) < 0) {
-        std::cerr << "Server fails to receive file size from client" << std::endl;
-        return;
-    }
+    std::cout << "received filename: " << filename << std::endl;
 
     // check if file exists
     if (stat(filename.c_str(), &file_stat) != 0) {
+        if (send_file_size(sockfd, (uint32_t)-1) < 0) {
+            std::cerr << "Failed to send -1 to client" << std::endl;
+            return;
+        }
         std::cerr << "File specified: " << filename << " doesn't exist" << std::endl;
         return;
     }
 
     md5sum = get_file_md5(filename);
+    std::cout << "md5sum: " << md5sum << std::endl;
     if (send_string(sockfd, md5sum) < 0) {
         std::cerr << "Server failed to send md5sum to client" << std::endl;
         return;
     }
 
     // Send file size
+    std::cout << "file_size: " << (uint32_t)file_stat.st_size << std::endl;
     if (send_file_size(sockfd, (uint32_t)file_stat.st_size) < 0) {
         std::cerr << "Server fails to send file size to client" << std::endl;
         return;
     }
 
+    std::cout << "after sending filesize" << std::endl;
+
     // Send file
     if (send_file(sockfd, filename) < 0) {
-        std::cerr << "Client fails to send file to server" << std::endl;
+        std::cerr << "Server fails to send file to server" << std::endl;
         return;
     }
+
+    std::cout << "after sending file" << std::endl;
+    return;
 }

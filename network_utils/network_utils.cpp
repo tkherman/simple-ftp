@@ -108,7 +108,9 @@ int send_file_size(int sockfd, uint32_t size) {
     int ret;
 
     // send 32-bit file size
-    size = htonl(size);
+    std::cout << "size in send_file_size: " << size << std::endl;
+    // size = htonl(size);
+    // std::cout << "size in send_file_size after htonl: " << size << std::endl;
     if ((ret = send(sockfd, &size, sizeof(uint32_t), 0)) < 0)
         perror("ERROR sending 32-bit file size");
 
@@ -119,6 +121,7 @@ int recv_file_size(int sockfd, uint32_t &size) {
     int ret;
     uint32_t temp_size;
     char buffer[BUFSIZ];
+    // std::cout << "size in recv_file_size: " << size << std::endl;
 
     // recv 32-bit file size
     memset(buffer, 0, BUFSIZ);
@@ -127,7 +130,9 @@ int recv_file_size(int sockfd, uint32_t &size) {
         return ret;
     }
     memcpy(&temp_size, buffer, sizeof(uint32_t));
-    size = ntohl(temp_size);
+    size = temp_size;
+    std::cout << "temp_size in recv_file_size after recv: " << temp_size << std::endl;
+    std::cout << "ntohl size in recv_file_size after recv: " << size << std::endl;
 
     return ret;
 }
@@ -177,7 +182,6 @@ int send_file(int sockfd, std::string filename) {
             }
         }
     }
-
     file.close();
 }
 
@@ -188,21 +192,24 @@ int recv_file(int sockfd, uint32_t size, std::string filename) {
     std::ofstream file;
     file.open(filename, std::ios::binary | std::ios::trunc);
 
+    std::cout << "In recv_file" << std::endl;
+    std::cout << "filename: " << filename << " size: " << size << std::endl;
+
     if (file.is_open()) {
         while (received < size) {
             // receive binary data over socket
+            std::cout << "received: " << received << " size: " << size << std::endl;
             memset(buffer, 0, BUFSIZ);
             if ((ret = recv(sockfd, buffer, BUFSIZ, 0)) < 0) {
                 perror("ERROR receiving file");
                 break;
             }
-
             // write to file
+            std::cout << "buffer: " << buffer << std::endl;
             file.write(buffer, ret);
             received += ret;
         }
     }
-
     file.close();
 }
 

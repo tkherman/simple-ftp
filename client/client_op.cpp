@@ -107,6 +107,7 @@ void download_file(int sockfd, std::vector<std::string> args) {
     std::string ret_filename;
     std::string md5sum;
     std::string ret_md5sum;
+    std::string file_exists_on_server;
     struct stat file_stat;
     uint32_t throughput;
     uint32_t file_size;
@@ -120,6 +121,7 @@ void download_file(int sockfd, std::vector<std::string> args) {
         return;
     }
     filename = args[0];
+    // std::cout << "filename: " << filename << std::endl;
 
     // Send DL request to server
     if (send_string(sockfd, std::string("DL")) < 0) {
@@ -133,22 +135,25 @@ void download_file(int sockfd, std::vector<std::string> args) {
         return;
     }
 
-    // Send file size
-    if (send_file_size(sockfd, (uint32_t)file_stat.st_size) < 0) {
-        std::cerr << "Client fails to send file size to server" << std::endl;
+    // recv file size from server
+    if (recv_file_size(sockfd, file_size) < 0) {
+        if (file_size == (uint32_t)-1) {
+            std::cerr << "Specified file: " << filename << " does not exist on server." << std::endl;
+            return;
+        }
+        std::cerr << "Client fails to receive file size from server" << std::endl;
         return;
     }
+    std::cout << "file size after received: " << file_size << std::endl;
 
     // Recv checksum
     if (recv_string(sockfd, ret_md5sum) < 0) {
         std::cerr << "Client fails to receive md5checksum" << std::endl;
-    }
-
-    // recv file size from server
-    if (recv_file_size(sockfd, file_size) < 0) {
-        std::cerr << "Client fails to receive file size from server" << std::endl;
         return;
     }
+     std::cout << "after returned md5sum" << std::endl;
+
+
 
     // recv file from server
     gettimeofday(&st, NULL);
@@ -156,6 +161,8 @@ void download_file(int sockfd, std::vector<std::string> args) {
         std::cerr << "Client fails to receive file from server" << std::endl;
         return;
     }
+    std::cout << "filename after recv: " << filename << std::endl;
+    std::cout << "filesize after recv: " << file_size << std::endl;
     gettimeofday(&et, NULL);
     time_elasped = get_time_elasped(st, et);
     throughput = (file_size * 1000000) / time_elasped;
@@ -163,12 +170,14 @@ void download_file(int sockfd, std::vector<std::string> args) {
 
     // calculate hash and compare to hash from server
     md5sum = get_file_md5(filename);
+    std::cout << "md5sum: " << md5sum << std::endl;
     if (md5sum.compare(ret_md5sum)) {
-        std::cout << "Upload fails: md5sum returned is different, download failed" << std::endl;
+        std::cout << "Download fails: md5sum returned is different, download failed" << std::endl;
     } else {
         std::cout << "Download successful" << std::endl;
         std::cout << "Throughput: " << throughput << " bytes/second" << std::endl;
         std::cout << "Md5sum: " << md5sum << std::endl;
     }
+    return;
 
 }
